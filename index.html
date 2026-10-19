@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-body">
+
+<div class="login-box">
+
+    <h2>🔐 Admin Login</h2>
+    <p>Authorized administrator only</p>
+
+    <form id="loginForm">
+
+        <label>Email Address</label>
+        <input id="email" type="email" placeholder="Enter admin email" required>
+
+        <label>Password</label>
+        <input id="password" type="password" placeholder="Enter password" required>
+
+        <button class="primary-btn" id="loginBtn" type="submit">Login</button>
+        <div id="loginError" class="message error"></div>
+
+    </form>
+
+</div>
+
+<script type="module">
+
+import { auth, ADMIN_UID } from "./firebase-config.js";
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const form = document.getElementById("loginForm");
+const button = document.getElementById("loginBtn");
+const errorBox = document.getElementById("loginError");
+
+onAuthStateChanged(auth, (user) => {
+    if (user && user.uid === ADMIN_UID) {
+        window.location.replace("dashboard.html");
+    }
+});
+
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    button.disabled = true;
+    button.textContent = "Logging in...";
+    errorBox.textContent = "";
+
+    try {
+        const result = await signInWithEmailAndPassword(
+            auth,
+            document.getElementById("email").value.trim(),
+            document.getElementById("password").value
+        );
+
+        if (result.user.uid !== ADMIN_UID) {
+            await signOut(auth);
+            throw new Error("Unauthorized");
+        }
+
+        window.location.replace("dashboard.html");
+
+    } catch (error) {
+        errorBox.textContent = "Login failed or access denied.";
+        button.disabled = false;
+        button.textContent = "Login";
+    }
+});
+
+</script>
+</body>
+</html>

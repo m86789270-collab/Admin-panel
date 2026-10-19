@@ -1,0 +1,1978 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080f1f">
+
+<title>Premium Admin Dashboard</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+:root {
+    --bg: #080f1f;
+    --card: #111c30;
+    --card-light: #17243b;
+    --border: #263750;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --blue: #3b82f6;
+    --green: #10b981;
+    --red: #ef4444;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body.dashboard-body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+        radial-gradient(
+            ellipse at 50% 0%,
+            rgba(37,99,235,.09),
+            transparent 55%
+        ),
+        var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    overflow-x: hidden;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+button:focus-visible,
+a:focus-visible {
+    outline: 2px solid #60a5fa;
+    outline-offset: 3px;
+}
+
+#loading {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 600;
+    z-index: 99999;
+}
+
+/* HEADER */
+
+.dashboard-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
+    background: rgba(10,18,35,.97);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 5px 30px rgba(0,0,0,.2);
+    z-index: 1000;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.menu-toggle {
+    width: 43px;
+    height: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #17243b;
+    color: white;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    font-size: 24px;
+}
+
+.dashboard-logo {
+    font-size: 20px;
+    font-weight: 800;
+    color: white;
+}
+
+.logout-btn {
+    padding: 11px 19px;
+    background: linear-gradient(135deg,#ef4444,#b91c1c);
+    color: white;
+    border: none;
+    border-radius: 11px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* SIDEBAR */
+
+.sidebar {
+    position: fixed;
+    top: 72px;
+    left: 0;
+    width: 280px;
+    height: calc(100dvh - 72px);
+    padding: 25px 16px;
+    background: #0e192b;
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform .3s ease;
+    z-index: 999;
+}
+
+.sidebar.active {
+    transform: translateX(0);
+}
+
+.sidebar-title {
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin: 10px 13px 22px;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 8px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    color: #cbd5e1;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    text-decoration: none;
+    transition: .2s;
+}
+
+.sidebar-item:hover {
+    background: #17243b;
+}
+
+.sidebar-item.active {
+    background: rgba(37,99,235,.18);
+    border-color: rgba(59,130,246,.3);
+    color: #93c5fd;
+}
+
+.sidebar-overlay {
+    position: fixed;
+    inset: 72px 0 0;
+    background: rgba(0,0,0,.65);
+    backdrop-filter: blur(3px);
+    display: none;
+    z-index: 998;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* MAIN */
+
+.dashboard-container {
+    width: 100%;
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 110px 25px 60px;
+}
+
+.dashboard-container h1 {
+    font-size: 29px;
+    font-weight: 800;
+    margin: 0 0 10px;
+}
+
+.subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+.dashboard-view {
+    display: none;
+}
+
+.dashboard-view.active {
+    display: block;
+    animation: fadeIn .25s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* STATISTICS */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4,minmax(0,1fr));
+    gap: 18px;
+    margin-bottom: 35px;
+}
+
+.stat-card {
+    position: relative;
+    min-width: 0;
+    padding: 24px;
+    background: linear-gradient(145deg,#142139,#101a2d);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent);
+}
+
+.stat-card h3 {
+    color: #cbd5e1;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0 0 19px;
+}
+
+.stat-number {
+    font-size: 39px;
+    font-weight: 800;
+    color: var(--accent);
+}
+
+.stat-small {
+    color: #64748b;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+.blue-card { --accent: #38bdf8; }
+.green-card { --accent: #34d399; }
+.yellow-card { --accent: #facc15; }
+.purple-card { --accent: #c084fc; }
+
+.section-title {
+    font-size: 21px;
+    font-weight: 800;
+    margin: 35px 0 19px;
+}
+
+/* WEBSITE CARDS */
+
+.website-grid,
+.document-grid {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 18px;
+}
+
+.website-card,
+.document-card {
+    min-width: 0;
+    padding: 24px;
+    background: linear-gradient(145deg,#142139,#101a2d);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+}
+
+.website-card h3,
+.document-card h3 {
+    font-size: 17px;
+    font-weight: 800;
+    margin: 0 0 15px;
+}
+
+.website-url {
+    padding: 13px;
+    background: #080f1f;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: #7dd3fc;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+.website-actions {
+    display: flex;
+    gap: 11px;
+    margin-top: 17px;
+}
+
+.copy-btn,
+.open-btn,
+.document-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 45px;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    text-align: center;
+}
+
+.copy-btn {
+    flex: 1;
+    background: #2563eb;
+}
+
+.open-btn {
+    flex: 1;
+    background: #059669;
+}
+
+.document-card p {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+.document-button {
+    width: 100%;
+    background: linear-gradient(135deg,#2563eb,#1d4ed8);
+}
+
+/* DOCUMENT PAGE HEADER */
+
+.document-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.document-header h2 {
+    font-size: 24px;
+    font-weight: 800;
+    margin: 0;
+}
+
+/* BACK BUTTON */
+
+.page-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    min-height: 48px;
+    padding: 12px 22px;
+
+    background: linear-gradient(135deg,#2563eb,#1e40af);
+    color: #ffffff;
+
+    border: 1px solid rgba(147,197,253,.3);
+    border-radius: 12px;
+
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    transition: background .2s ease, transform .2s ease;
+}
+
+.page-back-btn:hover {
+    background: linear-gradient(135deg,#3b82f6,#2563eb);
+}
+
+.page-back-btn:active {
+    transform: scale(.98);
+}
+
+.page-back-icon {
+    display: block;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.page-back-text {
+    display: block;
+    line-height: 1;
+}
+
+/* DOCUMENT CARDS */
+
+.payment-card {
+    padding: 25px;
+    background: #111c30;
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    margin-bottom: 18px;
+}
+
+.payment-card h3 {
+    font-size: 17px;
+    margin: 0 0 14px;
+}
+
+.payment-card p {
+    color: #cbd5e1;
+    font-size: 14px;
+    line-height: 1.7;
+    margin: 10px 0;
+    overflow-wrap: anywhere;
+}
+
+.payment-card strong {
+    color: #93c5fd;
+}
+
+.badge {
+    display: inline-block;
+    padding: 6px 13px;
+    background: rgba(16,185,129,.12);
+    color: #34d399;
+    border: 1px solid rgba(16,185,129,.2);
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 13px;
+}
+
+.document-data {
+    margin-top: 15px;
+    padding: 15px;
+    background: #0b1425;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.document-data p {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(148,163,184,.1);
+}
+
+.document-data p:last-child {
+    border-bottom: none;
+}
+
+/* LOTTERY INFORMATION */
+
+.lottery-info {
+    margin: 18px 0;
+    padding: 20px;
+    background: linear-gradient(145deg,#0b1425,#111c30);
+    border: 1px solid #263750;
+    border-radius: 14px;
+}
+
+.lottery-row {
+    padding: 15px 0;
+    border-bottom: 1px solid #263750;
+}
+
+.lottery-row:last-child {
+    border-bottom: none;
+}
+
+.lottery-row strong {
+    display: block;
+    color: #93c5fd;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.lottery-row p {
+    color: #f1f5f9;
+    font-size: 16px;
+    font-weight: 700;
+    margin: 5px 0;
+    overflow-wrap: anywhere;
+}
+
+.lottery-row .copy-btn {
+    margin-top: 12px;
+    min-height: 38px;
+    padding: 9px 17px;
+    border-radius: 9px;
+}
+
+/* DELETE */
+
+.delete-action {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+}
+
+.delete-btn {
+    padding: 12px 18px;
+    background: linear-gradient(135deg,#ef4444,#b91c1c);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.delete-btn:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.empty {
+    padding: 35px 20px;
+    background: #111c30;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    color: var(--muted);
+    text-align: center;
+}
+
+.info-box {
+    padding: 25px;
+    background: #111c30;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+}
+
+.info-box p {
+    color: #cbd5e1;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+/* MODAL */
+
+.delete-modal[hidden] {
+    display: none !important;
+}
+
+.delete-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0,0,0,.78);
+    backdrop-filter: blur(8px);
+    z-index: 99999;
+}
+
+.delete-modal-box {
+    width: 100%;
+    max-width: 390px;
+    padding: 32px 25px;
+    background: linear-gradient(145deg,#17243b,#0f192c);
+    border: 1px solid #334155;
+    border-radius: 22px;
+    text-align: center;
+}
+
+.delete-modal-icon {
+    font-size: 35px;
+    margin-bottom: 20px;
+}
+
+.delete-modal-box h2 {
+    color: white;
+    font-size: 23px;
+}
+
+.delete-modal-box p {
+    color: #cbd5e1;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.delete-warning {
+    color: #f87171 !important;
+}
+
+.delete-modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 27px;
+}
+
+.delete-modal-actions button {
+    flex: 1;
+    min-height: 49px;
+    border: none;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+#cancelDelete {
+    background: #334155;
+    color: white;
+}
+
+#confirmDelete {
+    background: linear-gradient(135deg,#ef4444,#b91c1c);
+    color: white;
+}
+
+.delete-modal-actions button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+/* TOAST */
+
+.dashboard-toast {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    max-width: 90%;
+    padding: 15px 22px;
+    background: #059669;
+    color: white;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    display: none;
+    z-index: 100000;
+}
+
+.dashboard-toast.error {
+    background: #dc2626;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:950px) {
+    .stats {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+    }
+}
+
+@media(max-width:600px) {
+
+    .dashboard-header {
+        padding: 0 14px;
+    }
+
+    .dashboard-logo {
+        font-size: 16px;
+    }
+
+    .header-left {
+        gap: 10px;
+    }
+
+    .logout-btn {
+        padding: 10px 13px;
+    }
+
+    .dashboard-container {
+        padding: 100px 15px 45px;
+    }
+
+    .dashboard-container h1 {
+        font-size: 24px;
+    }
+
+    .stats {
+        gap: 12px;
+    }
+
+    .stat-card {
+        padding: 19px 15px;
+    }
+
+    .stat-card h3 {
+        font-size: 12px;
+    }
+
+    .stat-number {
+        font-size: 31px;
+    }
+
+    .website-grid,
+    .document-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .document-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .page-back-btn {
+        width: 100%;
+    }
+
+    .payment-card {
+        padding: 18px;
+    }
+
+    .lottery-info {
+        padding: 15px;
+    }
+
+    .lottery-row p {
+        font-size: 14px;
+    }
+
+    .dashboard-toast {
+        left: 5%;
+        right: 5%;
+        bottom: 15px;
+        max-width: none;
+        text-align: center;
+    }
+
+}
+
+</style>
+</head>
+
+<body class="dashboard-body">
+
+<div id="loading">
+    Checking administrator access...
+</div>
+
+<div id="dashboard" style="display:none">
+
+<header class="dashboard-header">
+
+    <div class="header-left">
+
+        <button
+            class="menu-toggle"
+            id="menuToggle"
+            type="button"
+            aria-label="Open navigation menu"
+            aria-expanded="false"
+        >
+            ☰
+        </button>
+
+        <div class="dashboard-logo">
+            ⚡ Admin Dashboard
+        </div>
+
+    </div>
+
+    <button class="logout-btn" id="logoutBtn" type="button">
+        Logout
+    </button>
+
+</header>
+
+<aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-title">
+        MAIN NAVIGATION
+    </div>
+
+    <button class="sidebar-item active" type="button" data-view="home">
+        🏠 Dashboard Home
+    </button>
+
+    <button class="sidebar-item" type="button" data-view="page1Documents">
+        📁 Page 1 Documents
+    </button>
+
+    <button class="sidebar-item" type="button" data-view="page2Documents">
+        📁 Page 2 Documents
+    </button>
+
+    <button class="sidebar-item" type="button" data-view="unknownDocuments">
+        📂 Unassigned Documents
+    </button>
+
+    <button class="sidebar-item" type="button" data-view="information">
+        ℹ️ System Information
+    </button>
+
+    <div class="sidebar-title">
+        QUICK LINKS
+    </div>
+
+    <a
+        class="sidebar-item"
+        href="https://m86789270-collab.github.io/Winoffer/"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        🔗 Website 1
+    </a>
+
+    <a
+        class="sidebar-item"
+        href="https://m86789270-collab.github.io/pronhub120/"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        🔗 Website 2
+    </a>
+
+</aside>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="dashboard-container">
+
+<section id="home" class="dashboard-view active">
+
+<h1>Dashboard Overview</h1>
+
+<p class="subtitle">Real-time Firebase Monitoring</p>
+
+<div class="stats">
+
+    <div class="stat-card blue-card">
+        <h3>👥 Page 1 Visitors</h3>
+        <div class="stat-number" id="page1Visitors">0</div>
+        <div class="stat-small">Website 1 Visits</div>
+    </div>
+
+    <div class="stat-card green-card">
+        <h3>👥 Page 2 Visitors</h3>
+        <div class="stat-number" id="page2Visitors">0</div>
+        <div class="stat-small">Website 2 Visits</div>
+    </div>
+
+    <div class="stat-card yellow-card">
+        <h3>📋 Page 1 Documents</h3>
+        <div class="stat-number" id="page1Count">0</div>
+        <div class="stat-small">Identified Submissions</div>
+    </div>
+
+    <div class="stat-card purple-card">
+        <h3>📋 Page 2 Documents</h3>
+        <div class="stat-number" id="page2Count">0</div>
+        <div class="stat-small">Identified Submissions</div>
+    </div>
+
+</div>
+
+<h2 class="section-title">🔗 Website Links</h2>
+
+<div class="website-grid">
+
+    <div class="website-card">
+
+        <h3>🔵 Website 1 — Winoffer</h3>
+
+        <div class="website-url" id="websiteLink1">
+            https://m86789270-collab.github.io/Winoffer/
+        </div>
+
+        <div class="website-actions">
+
+            <button class="copy-btn" type="button" data-copy="websiteLink1">
+                📋 Copy Link
+            </button>
+
+            <a
+                class="open-btn"
+                href="https://m86789270-collab.github.io/Winoffer/"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                🔗 Open
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="website-card">
+
+        <h3>🟢 Website 2 — pronhub120</h3>
+
+        <div class="website-url" id="websiteLink2">
+            https://m86789270-collab.github.io/pronhub120/
+        </div>
+
+        <div class="website-actions">
+
+            <button class="copy-btn" type="button" data-copy="websiteLink2">
+                📋 Copy Link
+            </button>
+
+            <a
+                class="open-btn"
+                href="https://m86789270-collab.github.io/pronhub120/"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                🔗 Open
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+<h2 class="section-title">📁 Document Management</h2>
+
+<div class="document-grid">
+
+    <div class="document-card">
+
+        <h3>🔵 Page 1 Documents</h3>
+
+        <p>View submission records received from Website 1.</p>
+
+        <button class="document-button" type="button" data-view="page1Documents">
+            📂 View Page 1 Documents
+        </button>
+
+    </div>
+
+    <div class="document-card">
+
+        <h3>🟢 Page 2 Documents</h3>
+
+        <p>View submission records received from Website 2.</p>
+
+        <button class="document-button" type="button" data-view="page2Documents">
+            📂 View Page 2 Documents
+        </button>
+
+    </div>
+
+</div>
+
+</section>
+
+<section id="page1Documents" class="dashboard-view">
+
+    <div class="document-header">
+
+        <h2>🔵 Page 1 Documents</h2>
+
+        <button class="page-back-btn" type="button" data-view="home">
+            <svg class="page-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            <span class="page-back-text">Back to Dashboard</span>
+        </button>
+
+    </div>
+
+    <div id="page1List" class="empty">
+        Loading documents...
+    </div>
+
+</section>
+
+<section id="page2Documents" class="dashboard-view">
+
+    <div class="document-header">
+
+        <h2>🟢 Page 2 Documents</h2>
+
+        <button class="page-back-btn" type="button" data-view="home">
+            <svg class="page-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            <span class="page-back-text">Back to Dashboard</span>
+        </button>
+
+    </div>
+
+    <div id="page2List" class="empty">
+        Loading documents...
+    </div>
+
+</section>
+
+<section id="unknownDocuments" class="dashboard-view">
+
+    <div class="document-header">
+
+        <h2>📂 Unassigned Documents</h2>
+
+        <button class="page-back-btn" type="button" data-view="home">
+            <svg class="page-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            <span class="page-back-text">Back to Dashboard</span>
+        </button>
+
+    </div>
+
+    <p class="subtitle">
+        Submissions without a valid website identifier appear here.
+    </p>
+
+    <div id="unknownList" class="empty">
+        Loading documents...
+    </div>
+
+</section>
+
+<section id="information" class="dashboard-view">
+
+    <div class="document-header">
+
+        <h2>ℹ️ System Information</h2>
+
+        <button class="page-back-btn" type="button" data-view="home">
+            <svg class="page-back-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            <span class="page-back-text">Back to Dashboard</span>
+        </button>
+
+    </div>
+
+    <div class="info-box">
+
+        <p><strong>Firebase Project:</strong> new-projuct-1</p>
+
+        <p><strong>Monitoring:</strong> Real-time Firestore</p>
+
+        <p><strong>Website 1:</strong> Winoffer</p>
+
+        <p><strong>Website 2:</strong> pronhub120</p>
+
+        <p><strong>Visitor Collection:</strong> visitors</p>
+
+        <p><strong>Submission Collection:</strong> demoSubmissions</p>
+
+    </div>
+
+</section>
+
+</div>
+</div>
+
+<!-- DELETE MODAL -->
+
+<div id="deleteModal" class="delete-modal" hidden>
+
+    <div
+        class="delete-modal-box"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="deleteModalTitle"
+    >
+
+        <div class="delete-modal-icon">🗑️</div>
+
+        <h2 id="deleteModalTitle">Delete Document?</h2>
+
+        <p>
+            Are you sure you want to permanently delete this submission record?
+        </p>
+
+        <p class="delete-warning">
+            This action cannot be undone.
+        </p>
+
+        <div class="delete-modal-actions">
+
+            <button id="cancelDelete" type="button">
+                Cancel
+            </button>
+
+            <button id="confirmDelete" type="button">
+                Delete
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div
+    id="dashboardToast"
+    class="dashboard-toast"
+    role="status"
+    aria-live="polite"
+></div>
+
+<script type="module">
+
+import {
+    auth,
+    db,
+    ADMIN_UID
+} from "./firebase-config.js";
+
+import {
+    createLotteryInfo
+} from "./lottery-cards.js";
+
+import {
+    onAuthStateChanged,
+    signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+    collection,
+    onSnapshot,
+    doc,
+    deleteDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* VARIABLES */
+
+let started = false;
+
+let unsubscribers = [];
+
+let toastTimer = null;
+
+let pendingDelete = null;
+
+let lastFocusedElement = null;
+
+const sidebar = document.getElementById("sidebar");
+
+const overlay = document.getElementById("sidebarOverlay");
+
+const menuToggle = document.getElementById("menuToggle");
+
+const deleteModal = document.getElementById("deleteModal");
+
+const confirmDeleteBtn = document.getElementById("confirmDelete");
+
+const cancelDeleteBtn = document.getElementById("cancelDelete");
+
+/* WEBSITE DETECTION */
+
+/*
+    এই ফিল্ডগুলো থেকে ওয়েবসাইট চেনা হবে।
+    প্রথম যে ফিল্ডে মিল পাওয়া যাবে, সেটিই ব্যবহৃত হবে।
+*/
+const WEBSITE_FIELDS = [
+    "pageId",
+    "page",
+    "pageName",
+    "website",
+    "websiteName",
+    "siteId",
+    "siteName",
+    "site",
+    "source",
+    "sourceUrl",
+    "pageUrl",
+    "url",
+    "origin",
+    "referrer"
+];
+
+const WEBSITE_LABELS = {
+    page1: "Website 1 (Winoffer)",
+    page2: "Website 2 (pronhub120)",
+    unknown: "Unassigned"
+};
+
+function normalizeText(value) {
+
+    return String(value ?? "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+
+}
+
+function detectWebsite(data) {
+
+    for (const field of WEBSITE_FIELDS) {
+
+        const value = normalizeText(data[field]);
+
+        if (!value) continue;
+
+        if (
+            value.includes("page1") ||
+            value.includes("website1") ||
+            value.includes("winoffer")
+        ) {
+            return "page1";
+        }
+
+        if (
+            value.includes("page2") ||
+            value.includes("website2") ||
+            value.includes("pronhub")
+        ) {
+            return "page2";
+        }
+
+    }
+
+    return "unknown";
+
+}
+
+/* AUTHENTICATION */
+
+onAuthStateChanged(auth, async user => {
+
+    if (!user || user.uid !== ADMIN_UID) {
+
+        stopListeners();
+
+        if (user) {
+            await signOut(auth);
+        }
+
+        window.location.replace("index.html");
+
+        return;
+    }
+
+    document.getElementById("loading").style.display = "none";
+
+    document.getElementById("dashboard").style.display = "block";
+
+    if (!started) {
+
+        started = true;
+
+        loadDashboard();
+
+    }
+
+});
+
+/* STOP LISTENERS */
+
+function stopListeners() {
+
+    unsubscribers.forEach(unsubscribe => unsubscribe());
+
+    unsubscribers = [];
+
+    started = false;
+
+}
+
+/* LOGOUT */
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+
+    stopListeners();
+
+    await signOut(auth);
+
+    window.location.replace("index.html");
+
+});
+
+/* TOAST */
+
+function showToast(message, isError = false) {
+
+    const toast = document.getElementById("dashboardToast");
+
+    clearTimeout(toastTimer);
+
+    toast.textContent = message;
+
+    toast.className = isError
+        ? "dashboard-toast error"
+        : "dashboard-toast";
+
+    toast.style.display = "block";
+
+    toastTimer = setTimeout(() => {
+
+        toast.style.display = "none";
+
+    }, 3500);
+
+}
+
+/* SIDEBAR */
+
+function openSidebar() {
+
+    sidebar.classList.add("active");
+
+    overlay.classList.add("active");
+
+    menuToggle.setAttribute("aria-expanded", "true");
+
+}
+
+function closeSidebar() {
+
+    sidebar.classList.remove("active");
+
+    overlay.classList.remove("active");
+
+    menuToggle.setAttribute("aria-expanded", "false");
+
+}
+
+menuToggle.addEventListener("click", () => {
+
+    if (sidebar.classList.contains("active")) {
+        closeSidebar();
+    } else {
+        openSidebar();
+    }
+
+});
+
+overlay.addEventListener("click", closeSidebar);
+
+/* NAVIGATION */
+
+function showView(viewId) {
+
+    const target = document.getElementById(viewId);
+
+    if (!target || !target.classList.contains("dashboard-view")) {
+        return;
+    }
+
+    document.querySelectorAll(".dashboard-view").forEach(view => {
+
+        view.classList.remove("active");
+
+    });
+
+    target.classList.add("active");
+
+    document.querySelectorAll(".sidebar-item[data-view]").forEach(button => {
+
+        button.classList.toggle(
+            "active",
+            button.dataset.view === viewId
+        );
+
+    });
+
+    closeSidebar();
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+document.querySelectorAll("[data-view]").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        showView(button.dataset.view);
+
+    });
+
+});
+
+/* COPY WEBSITE LINKS */
+
+document.querySelectorAll("[data-copy]").forEach(button => {
+
+    button.addEventListener("click", async () => {
+
+        const element = document.getElementById(button.dataset.copy);
+
+        const link = element.textContent.trim();
+
+        try {
+
+            await navigator.clipboard.writeText(link);
+
+            showToast("✅ Link copied successfully!");
+
+        } catch (error) {
+
+            console.error(error);
+
+            showToast("Unable to copy link.", true);
+
+        }
+
+    });
+
+});
+
+/* DELETE MODAL */
+
+function openDeleteModal(documentId, button) {
+
+    if (pendingDelete) return;
+
+    pendingDelete = {
+        documentId,
+        button
+    };
+
+    lastFocusedElement = document.activeElement;
+
+    deleteModal.hidden = false;
+
+    confirmDeleteBtn.focus();
+
+}
+
+function closeDeleteModal() {
+
+    if (confirmDeleteBtn.disabled) return;
+
+    deleteModal.hidden = true;
+
+    pendingDelete = null;
+
+    if (lastFocusedElement?.isConnected) {
+        lastFocusedElement.focus();
+    }
+
+}
+
+cancelDeleteBtn.addEventListener("click", closeDeleteModal);
+
+deleteModal.addEventListener("click", event => {
+
+    if (event.target === deleteModal) {
+        closeDeleteModal();
+    }
+
+});
+
+document.addEventListener("keydown", event => {
+
+    if (event.key === "Escape") {
+
+        if (!deleteModal.hidden) {
+            closeDeleteModal();
+        } else {
+            closeSidebar();
+        }
+
+    }
+
+});
+
+deleteModal.addEventListener("keydown", event => {
+
+    if (event.key !== "Tab") return;
+
+    const buttons = [
+        cancelDeleteBtn,
+        confirmDeleteBtn
+    ].filter(button => !button.disabled);
+
+    if (!buttons.length) return;
+
+    const first = buttons[0];
+    const last = buttons[buttons.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+
+        event.preventDefault();
+        last.focus();
+
+    } else if (!event.shiftKey && document.activeElement === last) {
+
+        event.preventDefault();
+        first.focus();
+
+    }
+
+});
+
+/* CONFIRM DELETE */
+
+confirmDeleteBtn.addEventListener("click", async () => {
+
+    if (!pendingDelete || confirmDeleteBtn.disabled) {
+        return;
+    }
+
+    const {
+        documentId,
+        button
+    } = pendingDelete;
+
+    confirmDeleteBtn.disabled = true;
+    cancelDeleteBtn.disabled = true;
+
+    confirmDeleteBtn.textContent = "Deleting...";
+
+    button.disabled = true;
+
+    try {
+
+        await deleteDoc(
+            doc(db, "demoSubmissions", documentId)
+        );
+
+        showToast("✅ Document deleted successfully!");
+
+        pendingDelete = null;
+
+        deleteModal.hidden = true;
+
+    } catch (error) {
+
+        console.error("Delete error:", error);
+
+        showToast(
+            "Unable to delete document. Check Firebase permissions.",
+            true
+        );
+
+        button.disabled = false;
+
+    } finally {
+
+        confirmDeleteBtn.disabled = false;
+        cancelDeleteBtn.disabled = false;
+
+        confirmDeleteBtn.textContent = "Delete";
+
+    }
+
+});
+
+/* ALLOWED METADATA FIELDS */
+
+const allowedFields = new Set([
+    "name",
+    "fullname",
+    "firstname",
+    "lastname",
+    "email",
+    "address",
+    "city",
+    "country",
+    "message",
+    "note",
+    "referenceid",
+    "submissiontype"
+]);
+
+function isAllowedField(name) {
+
+    return allowedFields.has(
+        normalizeText(name)
+    );
+
+}
+
+/* FORMAT VALUES */
+
+function formatValue(value) {
+
+    if (value === null || value === undefined) {
+        return "N/A";
+    }
+
+    if (value?.toDate && typeof value.toDate === "function") {
+
+        return value.toDate().toLocaleString();
+
+    }
+
+    if (typeof value === "string") {
+        return value;
+    }
+
+    if (typeof value === "number") {
+
+        if (!Number.isSafeInteger(value) && Number.isInteger(value)) {
+
+            return String(value) + " (precision may be lost)";
+
+        }
+
+        return String(value);
+    }
+
+    if (typeof value === "boolean") {
+        return value ? "Yes" : "No";
+    }
+
+    if (Array.isArray(value)) {
+
+        return value.map(item => {
+
+            if (
+                item === null ||
+                typeof item === "string" ||
+                typeof item === "number" ||
+                typeof item === "boolean"
+            ) {
+                return String(item);
+            }
+
+            return "[Complex value]";
+
+        }).join(", ");
+
+    }
+
+    return "[Structured data]";
+
+}
+
+/* CREATE DOCUMENT CARD */
+
+function createDocumentCard(submissionDoc, index) {
+
+    const data = submissionDoc.data();
+
+    const site = detectWebsite(data);
+
+    const box = document.createElement("div");
+
+    box.className = "payment-card";
+
+    const title = document.createElement("h3");
+
+    title.textContent = `${index + 1}. 📋 Submission Record`;
+
+    const badge = document.createElement("span");
+
+    badge.className = "badge";
+
+    badge.textContent = "Submitted";
+
+    box.append(title, badge);
+
+    /* LOTTERY INFORMATION CARD */
+
+    const lotteryInfo = createLotteryInfo(
+        data,
+        showToast
+    );
+
+    box.appendChild(lotteryInfo);
+
+    /* DOCUMENT DETAILS */
+
+    const dataContainer = document.createElement("div");
+
+    dataContainer.className = "document-data";
+
+    function addInfo(label, value) {
+
+        const p = document.createElement("p");
+
+        const strong = document.createElement("strong");
+
+        strong.textContent = label + ": ";
+
+        p.appendChild(strong);
+
+        p.appendChild(
+            document.createTextNode(formatValue(value))
+        );
+
+        dataContainer.appendChild(p);
+
+    }
+
+    addInfo("Submission ID", submissionDoc.id);
+
+    addInfo("Website", WEBSITE_LABELS[site]);
+
+    if (data.createdAt) {
+
+        addInfo("Submitted", data.createdAt);
+
+    }
+
+    Object.entries(data).forEach(([key, value]) => {
+
+        if (!isAllowedField(key)) {
+            return;
+        }
+
+        addInfo(key, value);
+
+    });
+
+    box.appendChild(dataContainer);
+
+    /* DELETE BUTTON */
+
+    const deleteArea = document.createElement("div");
+
+    deleteArea.className = "delete-action";
+
+    const deleteButton = document.createElement("button");
+
+    deleteButton.className = "delete-btn";
+
+    deleteButton.type = "button";
+
+    deleteButton.textContent = "🗑️ Delete Document";
+
+    deleteButton.addEventListener("click", () => {
+
+        openDeleteModal(
+            submissionDoc.id,
+            deleteButton
+        );
+
+    });
+
+    deleteArea.appendChild(deleteButton);
+
+    box.appendChild(deleteArea);
+
+    return box;
+
+}
+
+/* RENDER DOCUMENTS */
+
+function renderDocuments(elementId, documents) {
+
+    const list = document.getElementById(elementId);
+
+    list.replaceChildren();
+
+    list.className = "";
+
+    if (documents.length === 0) {
+
+        list.className = "empty";
+
+        list.textContent = "No documents available.";
+
+        return;
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    documents.forEach((submissionDoc, index) => {
+
+        fragment.appendChild(
+            createDocumentCard(submissionDoc, index)
+        );
+
+    });
+
+    list.appendChild(fragment);
+
+}
+
+/* DOCUMENT SORTING */
+
+function getDocumentTime(submissionDoc) {
+
+    const data = submissionDoc.data();
+
+    const value = data.createdAt;
+
+    if (value?.toMillis) {
+
+        return value.toMillis();
+
+    }
+
+    if (typeof value === "string") {
+
+        const parsed = Date.parse(value);
+
+        return Number.isNaN(parsed) ? 0 : parsed;
+
+    }
+
+    if (typeof value === "number") {
+
+        return Number.isFinite(value) ? value : 0;
+
+    }
+
+    return 0;
+
+}
+
+function sortDocuments(documents) {
+
+    return [...documents].sort((a, b) => {
+
+        return getDocumentTime(b) - getDocumentTime(a);
+
+    });
+
+}
+
+/* FIREBASE LIVE DATA */
+
+function loadDashboard() {
+
+    /* VISITORS */
+
+    const visitorsListener = onSnapshot(
+
+        collection(db, "visitors"),
+
+        snapshot => {
+
+            let page1 = 0;
+            let page2 = 0;
+
+            snapshot.forEach(visitorDoc => {
+
+                const site = detectWebsite(visitorDoc.data());
+
+                if (site === "page1") {
+
+                    page1++;
+
+                } else if (site === "page2") {
+
+                    page2++;
+
+                }
+
+            });
+
+            document.getElementById("page1Visitors")
+                .textContent = page1;
+
+            document.getElementById("page2Visitors")
+                .textContent = page2;
+
+        },
+
+        error => {
+
+            console.error("Visitor error:", error);
+
+            showToast(
+                "Unable to load visitor statistics.",
+                true
+            );
+
+        }
+
+    );
+
+    unsubscribers.push(visitorsListener);
+
+    /* SUBMISSIONS */
+
+    const submissionsListener = onSnapshot(
+
+        collection(db, "demoSubmissions"),
+
+        snapshot => {
+
+            const page1Docs = [];
+            const page2Docs = [];
+            const unknownDocs = [];
+
+            const allDocuments = sortDocuments(snapshot.docs);
+
+            allDocuments.forEach(submissionDoc => {
+
+                const site = detectWebsite(submissionDoc.data());
+
+                if (site === "page1") {
+
+                    page1Docs.push(submissionDoc);
+
+                } else if (site === "page2") {
+
+                    page2Docs.push(submissionDoc);
+
+                } else {
+
+                    unknownDocs.push(submissionDoc);
+
+                }
+
+            });
+
+            document.getElementById("page1Count")
+                .textContent = page1Docs.length;
+
+            document.getElementById("page2Count")
+                .textContent = page2Docs.length;
+
+            renderDocuments("page1List", page1Docs);
+
+            renderDocuments("page2List", page2Docs);
+
+            renderDocuments("unknownList", unknownDocs);
+
+        },
+
+        error => {
+
+            console.error("Submission error:", error);
+
+            [
+                "page1List",
+                "page2List",
+                "unknownList"
+            ].forEach(id => {
+
+                const list = document.getElementById(id);
+
+                list.className = "empty";
+
+                list.textContent =
+                    "Unable to load documents. Check Firestore permissions.";
+
+            });
+
+            showToast(
+                "Unable to load documents.",
+                true
+            );
+
+        }
+
+    );
+
+    unsubscribers.push(submissionsListener);
+
+}
+
+</script>
+
+</body>
+</html>
